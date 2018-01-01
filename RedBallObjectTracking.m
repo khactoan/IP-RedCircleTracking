@@ -18,11 +18,28 @@ function RedBallObjectTracking()
         diff_im = imsubtract(data(:,:,1), rgb2gray(data));
         diff_im = medfilt2(diff_im, [3 3]);
         diff_im = im2bw(diff_im,0.18);
-        imshow(data);
+%         imshow(data);
         Rmin = 20;
         Rmax = 80;
         [centersBright, radiiBright] = imfindcircles(diff_im,[Rmin Rmax],'ObjectPolarity','bright');
-        viscircles(centersBright, radiiBright,'Color','b');
+%         viscircles(centersBright, radiiBright,'Color','b');
+        [m n] = size(radiiBright);
+        if m == 0 && n == 0
+            imshow(data);
+        else
+            overlayImage = data;
+            imageSize = size(overlayImage);
+
+            for x=1:imageSize(1);
+                for y=1:imageSize(2);
+                    if (x-centersBright(1))^2 + (y-centersBright(2))^2 < radiiBright(1,1)^2
+                       overlayImage(y,x,:) = [0 0 0]; 
+                    end
+                end
+            end
+
+            imshow(overlayImage);
+        end
     end
 
     stop(vid);
