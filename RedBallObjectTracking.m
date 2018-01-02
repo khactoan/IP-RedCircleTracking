@@ -29,15 +29,16 @@ function RedBallObjectTracking()
         else
             overlayImage = data;
             imageSize = size(overlayImage);
-
-            for x=1:imageSize(1);
-                for y=1:imageSize(2);
-                    if (x-centersBright(1))^2 + (y-centersBright(2))^2 < radiiBright(1,1)^2
-                       overlayImage(y,x,:) = [0 0 0]; 
+            for a=1:m
+                for x=1:imageSize(1);
+                    for y=1:imageSize(2);
+                        if (x-centersBright(a,1))^2 + (y-centersBright(a,2))^2 < radiiBright(a,1)^2
+                           overlayImage(y,x,:) = [0 0 0]; 
+                        end
                     end
                 end
-            end
-
+            end 
+            
             imshow(overlayImage);
         end
     end
