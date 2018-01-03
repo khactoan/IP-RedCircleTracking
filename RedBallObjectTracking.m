@@ -1,9 +1,10 @@
 function RedBallObjectTracking() 
+    warning off;
     global KEY_IS_PRESSED;
     KEY_IS_PRESSED = 0;
     gcf;
     set(gcf, 'KeyPressFcn', @myKeyPressFcn);
-
+    
     camera = imaqhwinfo;
     [camera_name, camera_id, format] = getCameraInfo(camera);
     
@@ -19,8 +20,8 @@ function RedBallObjectTracking()
         diff_im = medfilt2(diff_im, [3 3]);
         diff_im = im2bw(diff_im,0.18);
 %         imshow(data);
-        Rmin = 20;
-        Rmax = 80;
+        Rmin = 10;
+        Rmax = 100;
         [centersBright, radiiBright] = imfindcircles(diff_im,[Rmin Rmax],'ObjectPolarity','bright');
 %         viscircles(centersBright, radiiBright,'Color','b');
         [m n] = size(radiiBright);
@@ -28,16 +29,35 @@ function RedBallObjectTracking()
             imshow(data);
         else
             overlayImage = data;
-            imageSize = size(overlayImage);
+           % imageSize = size(overlayImage);
+            [r c b] = size(data);
             for a=1:m
-                for x=1:imageSize(1);
-                    for y=1:imageSize(2);
-                        if (x-centersBright(a,1))^2 + (y-centersBright(a,2))^2 < radiiBright(a,1)^2
-                           overlayImage(y,x,:) = [0 0 0]; 
-                        end
-                    end
-                end
-            end 
+               down = centersBright(a,2) - radiiBright(a,1) -5;
+               top = centersBright(a,2)+ radiiBright(a,1) + 5;
+               left = centersBright(a,1) - radiiBright(a,1) -5;
+               right = centersBright(a,1) + radiiBright(a,1) +5;
+
+               if left < 1
+                    left = 1;
+               end
+               if right > c
+                    right = c;
+               end
+               if down < 1
+                    down = 1;
+               end
+               if top > r
+                    top = r;
+               end
+                for i=1:3
+                       
+                       
+                       window = overlayImage(down:top,left:right,i);
+                       H = fspecial('disk',50);
+                       window = imfilter(window,H,'replicate'); 
+                       overlayImage(down:top,left:right,i) = window;
+                end 
+            end
             
             imshow(overlayImage);
         end
