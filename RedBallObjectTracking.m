@@ -19,10 +19,9 @@ function RedBallObjectTracking()
         diff_im = imsubtract(data(:,:,1), rgb2gray(data));
         diff_im = medfilt2(diff_im, [3 3]);
         diff_im = im2bw(diff_im,0.18);
-%         imshow(data);
         Rmin = 10;
         Rmax = 100;
-        [centersBright, radiiBright] = imfindcircles(diff_im,[Rmin Rmax],'ObjectPolarity','bright');
+        [centersBright, radiiBright] = imfindcircles(diff_im,[Rmin Rmax],'ObjectPolarity','bright','Sensitivity',0.75);
 %         viscircles(centersBright, radiiBright,'Color','b');
         [m n] = size(radiiBright);
         if m == 0 && n == 0
@@ -32,10 +31,10 @@ function RedBallObjectTracking()
            % imageSize = size(overlayImage);
             [r c b] = size(data);
             for a=1:m
-               down = centersBright(a,2) - radiiBright(a,1) -5;
+               down = centersBright(a,2) - radiiBright(a,1) - 5;
                top = centersBright(a,2)+ radiiBright(a,1) + 5;
-               left = centersBright(a,1) - radiiBright(a,1) -5;
-               right = centersBright(a,1) + radiiBright(a,1) +5;
+               left = centersBright(a,1) - radiiBright(a,1) - 5;
+               right = centersBright(a,1) + radiiBright(a,1) + 5;
 
                if left < 1
                     left = 1;
@@ -49,14 +48,12 @@ function RedBallObjectTracking()
                if top > r
                     top = r;
                end
-                for i=1:3
-                       
-                       
-                       window = overlayImage(down:top,left:right,i);
-                       H = fspecial('disk',50);
-                       window = imfilter(window,H,'replicate'); 
-                       overlayImage(down:top,left:right,i) = window;
-                end 
+               for i=1:3   
+                    window = overlayImage(down:top,left:right,i);
+                    H = fspecial('disk',50);
+                    window = imfilter(window,H,'replicate'); 
+                    overlayImage(down:top,left:right,i) = window;
+               end 
             end
             
             imshow(overlayImage);
